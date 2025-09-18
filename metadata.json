@@ -1,0 +1,5 @@
+{
+  "name": "Blood Type Card Game",
+  "description": "A two-player card game where players place and connect blood type cards on a board based on randomly drawn actions like marriage, birth, or death.",
+  "requestFramePermissions": []
+}

@@ -6,6 +6,7 @@ import { createInitialDeck, ACTION_CARDS } from './constants';
 
 const App: React.FC = () => {
   const [currentPlayer, setCurrentPlayer] = useState<1 | 2>(1);
+  const [masterDeck] = useState<BloodCard[]>(() => createInitialDeck());
   const [deck, setDeck] = useState<BloodCard[]>([]);
   const [placedCards, setPlacedCards] = useState<{ [player: number]: PlacedCard[] }>({ 1: [], 2: [] });
   const [lines, setLines] = useState<{ [player: number]: Line[] }>({ 1: [], 2: [] });
@@ -15,11 +16,26 @@ const App: React.FC = () => {
   const [lineStartCardId, setLineStartCardId] = useState<string | null>(null);
 
   const handleDrawAction = useCallback(() => {
-    if (deck.length > 0) return;
+    if (currentAction) return;
+
     const randomAction: ActionType = ACTION_CARDS[Math.floor(Math.random() * ACTION_CARDS.length)];
     setCurrentAction({ type: 'action', value: randomAction });
-    setDeck(createInitialDeck());
-  }, [deck.length]);
+
+    const placedCardIds = new Set([
+      ...placedCards[1].map(c => c.id),
+      ...placedCards[2].map(c => c.id),
+    ]);
+
+    const availableCards = masterDeck.filter(card => !placedCardIds.has(card.id));
+
+    // Shuffle the available cards
+    for (let i = availableCards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [availableCards[i], availableCards[j]] = [availableCards[j], availableCards[i]];
+    }
+
+    setDeck(availableCards);
+  }, [currentAction, masterDeck, placedCards]);
 
   const handlePassTurn = () => {
     setCurrentPlayer(prev => (prev === 1 ? 2 : 1));
@@ -159,7 +175,7 @@ const App: React.FC = () => {
         <p className="text-yellow-400 font-bold text-lg mt-1">Player {currentPlayer}의 턴</p>
       </header>
 
-      <main className="flex-grow flex flex-col lg:flex-row gap-6">
+      <main className="flex-grow flex flex-col md:flex-row gap-6">
         <div className="flex-1 flex flex-col">
           <h3 className="text-xl font-semibold mb-2 text-center text-slate-400">Player 1 실행존</h3>
           <ExecutionZone
@@ -175,7 +191,7 @@ const App: React.FC = () => {
           />
         </div>
         
-        <div className="flex flex-col lg:w-[350px] lg:max-w-[350px] shrink-0 gap-4">
+        <div className="flex flex-col md:w-[350px] md:max-w-[350px] shrink-0 gap-4">
             <CardZone 
               deck={deck}
               currentAction={currentAction}

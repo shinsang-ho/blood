@@ -8,13 +8,14 @@ interface ExecutionZoneProps {
   placedCards: PlacedCard[];
   lines: Line[];
   onDrop: (e: React.DragEvent<HTMLDivElement>, player: 1 | 2) => void;
-  onPlacedCardDragStart: (e: React.DragEvent<HTMLDivElement>, cardId: string) => void;
+  onPlacedCardDragStart: (e: React.DragEvent<HTMLDivElement>, cardId: string, player: 1 | 2) => void;
+  onCardTouchStart: (e: React.TouchEvent<HTMLDivElement>, card: PlacedCard, player: 1 | 2) => void;
   isDrawingLine: boolean;
   onCardClick: (cardId: string, player: 1 | 2) => void;
   lineStartCardId: string | null;
 }
 
-export const ExecutionZone: React.FC<ExecutionZoneProps> = ({ player, isActive, placedCards, lines, onDrop, onPlacedCardDragStart, isDrawingLine, onCardClick, lineStartCardId }) => {
+export const ExecutionZone: React.FC<ExecutionZoneProps> = ({ player, isActive, placedCards, lines, onDrop, onPlacedCardDragStart, onCardTouchStart, isDrawingLine, onCardClick, lineStartCardId }) => {
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
@@ -33,6 +34,8 @@ export const ExecutionZone: React.FC<ExecutionZoneProps> = ({ player, isActive, 
       onDrop={(e) => onDrop(e, player)}
       className={`bg-slate-800/50 border-2 border-dashed p-4 rounded-lg shadow-inner flex-grow h-full relative transition-all duration-300 ${isActive ? activeClasses : inactiveClasses}`}
       style={{ minHeight: '300px' }}
+      data-drop-zone="execution"
+      data-player={player}
     >
       {placedCards.map(card => (
         <div
@@ -43,7 +46,13 @@ export const ExecutionZone: React.FC<ExecutionZoneProps> = ({ player, isActive, 
           onDragStart={(e) => {
               if (isActive) {
                   e.stopPropagation();
-                  onPlacedCardDragStart(e, card.id);
+                  onPlacedCardDragStart(e, card.id, player);
+              }
+          }}
+          onTouchStart={(e) => {
+              if(isActive) {
+                e.stopPropagation();
+                onCardTouchStart(e, card, player);
               }
           }}
         >

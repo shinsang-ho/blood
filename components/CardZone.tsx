@@ -7,17 +7,19 @@ interface CardZoneProps {
   currentAction: ActionCard | null;
   onDrawAction: () => void;
   onDeckCardDragStart: (e: React.DragEvent<HTMLDivElement>, card: BloodCard) => void;
+  onDeckCardTouchStart: (e: React.TouchEvent<HTMLDivElement>, card: BloodCard) => void;
   isActionCardDisabled: boolean;
   onDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   onDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
 }
 
-export const CardZone: React.FC<CardZoneProps> = ({ deck, currentAction, onDrawAction, onDeckCardDragStart, isActionCardDisabled, onDrop, onDragOver }) => {
+export const CardZone: React.FC<CardZoneProps> = ({ deck, currentAction, onDrawAction, onDeckCardDragStart, onDeckCardTouchStart, isActionCardDisabled, onDrop, onDragOver }) => {
   return (
     <div 
       className="bg-slate-800 p-4 rounded-lg shadow-inner w-full h-full flex flex-col items-center"
       onDrop={onDrop}
       onDragOver={onDragOver}
+      data-drop-zone="card"
     >
       <h2 className="text-2xl font-bold mb-4 text-slate-300">카드존</h2>
       
@@ -48,6 +50,7 @@ export const CardZone: React.FC<CardZoneProps> = ({ deck, currentAction, onDrawA
                 card={card} 
                 isDraggable={true} 
                 onDragStart={(e) => onDeckCardDragStart(e, card)}
+                onTouchStart={(e) => onDeckCardTouchStart(e, card)}
               />
             ))}
           </div>

@@ -30,59 +30,64 @@ export const ExecutionZone: React.FC<ExecutionZoneProps> = ({ player, isActive, 
 
   return (
     <div
-      onDragOver={handleDragOver}
-      onDrop={(e) => onDrop(e, player)}
-      className={`bg-slate-800/50 border-2 border-dashed p-4 rounded-lg shadow-inner flex-grow h-full relative transition-all duration-300 ${isActive ? activeClasses : inactiveClasses}`}
+      className={`bg-slate-800/50 border-2 border-dashed p-4 rounded-lg shadow-inner flex-grow h-full transition-all duration-300 overflow-scroll ${isActive ? activeClasses : inactiveClasses}`}
       style={{ minHeight: '300px' }}
-      data-drop-zone="execution"
-      data-player={player}
     >
-      {placedCards.map(card => (
         <div
-          key={card.id}
-          style={{ position: 'absolute', left: `${card.position.x}px`, top: `${card.position.y}px`, cursor: isActive ? 'move' : 'default' }}
-          className={isDrawingLine && isActive ? 'cursor-crosshair' : ''}
-          draggable={isActive}
-          onDragStart={(e) => {
-              if (isActive) {
-                  e.stopPropagation();
-                  onPlacedCardDragStart(e, card.id, player);
-              }
-          }}
-          onTouchStart={(e) => {
-              if(isActive) {
-                e.stopPropagation();
-                onCardTouchStart(e, card, player);
-              }
-          }}
+            onDragOver={handleDragOver}
+            onDrop={(e) => onDrop(e, player)}
+            className="relative"
+            style={{ width: '2000px', height: '2000px' }}
+            data-drop-zone="execution"
+            data-player={player}
         >
-          <CardDisplay
-            card={{ type: 'blood', value: card.bloodType, id: card.id }}
-            onClick={() => isDrawingLine && isActive && onCardClick(card.id, player)}
-            isSelected={lineStartCardId === card.id}
-          />
+            {placedCards.map(card => (
+                <div
+                key={card.id}
+                style={{ position: 'absolute', left: `${card.position.x}px`, top: `${card.position.y}px`, cursor: isActive ? 'move' : 'default' }}
+                className={isDrawingLine && isActive ? 'cursor-crosshair' : ''}
+                draggable={isActive}
+                onDragStart={(e) => {
+                    if (isActive) {
+                        e.stopPropagation();
+                        onPlacedCardDragStart(e, card.id, player);
+                    }
+                }}
+                onTouchStart={(e) => {
+                    if(isActive) {
+                        e.stopPropagation();
+                        onCardTouchStart(e, card, player);
+                    }
+                }}
+                >
+                <CardDisplay
+                    card={{ type: 'blood', value: card.bloodType, id: card.id }}
+                    onClick={() => isDrawingLine && isActive && onCardClick(card.id, player)}
+                    isSelected={lineStartCardId === card.id}
+                />
+                </div>
+            ))}
+            <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                {lines.map((line, index) => {
+                const fromPos = getCardPosition(line.from);
+                const toPos = getCardPosition(line.to);
+                if (fromPos && toPos) {
+                    return (
+                    <line
+                        key={index}
+                        x1={fromPos.x}
+                        y1={fromPos.y}
+                        x2={toPos.x}
+                        y2={toPos.y}
+                        stroke="#64748b"
+                        strokeWidth="3"
+                    />
+                    );
+                }
+                return null;
+                })}
+            </svg>
         </div>
-      ))}
-      <svg className="absolute top-0 left-0 w-full h-full pointer-events-none">
-        {lines.map((line, index) => {
-          const fromPos = getCardPosition(line.from);
-          const toPos = getCardPosition(line.to);
-          if (fromPos && toPos) {
-            return (
-              <line
-                key={index}
-                x1={fromPos.x}
-                y1={fromPos.y}
-                x2={toPos.x}
-                y2={toPos.y}
-                stroke="#64748b"
-                strokeWidth="3"
-              />
-            );
-          }
-          return null;
-        })}
-      </svg>
     </div>
   );
 };

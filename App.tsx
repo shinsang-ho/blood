@@ -84,12 +84,10 @@ const App: React.FC = () => {
   
       const { newCardId, placedCardId } = dragData;
       const zone = zoneElement.getBoundingClientRect();
-      const scrollContainer = zoneElement.parentElement;
-      if (!scrollContainer) return;
       
       if (newCardId && dragData.newCardValue) {
-        const x = dropCoords.clientX - zone.left + scrollContainer.scrollLeft - 32; // card width / 2
-        const y = dropCoords.clientY - zone.top + scrollContainer.scrollTop - 48; // card height / 2
+        const x = dropCoords.clientX - zone.left - 32; // card width / 2
+        const y = dropCoords.clientY - zone.top - 48; // card height / 2
         
         setPlacedCards(prev => ({
           ...prev,
@@ -101,8 +99,8 @@ const App: React.FC = () => {
         if (dragData.sourcePlayer !== player) return; // Can't move other player's card to your zone
         const offsetX = dragData.offsetX ?? 0;
         const offsetY = dragData.offsetY ?? 0;
-        const x = dropCoords.clientX - zone.left + scrollContainer.scrollLeft - offsetX;
-        const y = dropCoords.clientY - zone.top + scrollContainer.scrollTop - offsetY;
+        const x = dropCoords.clientX - zone.left - offsetX;
+        const y = dropCoords.clientY - zone.top - offsetY;
   
         setPlacedCards(prev => ({
           ...prev,
